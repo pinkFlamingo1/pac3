@@ -13,20 +13,10 @@ import random
 WIDTH = 640
 HEIGHT = 640
 TITLE = 'Pac-Man'
-
-char_to_image = {
-    '.': 'dot.png',
-    '=': 'wall.png',
-    '*': 'power.png',
-    'g': 'ghost1.png',
-    'G': 'ghost2.png',
-}
-
 WORLD_SIZE = 20
 BLOCK_SIZE = 32
 WIDTH = WORLD_SIZE * BLOCK_SIZE
 HEIGHT = WORLD_SIZE * BLOCK_SIZE
-
 SPEED = 2
 GHOST_SPEED = 1
 WELCOME_SCREEN = '''
@@ -41,6 +31,14 @@ Leaderboard:
 3. 800
 4. 700
 '''
+
+char_to_image = {
+    '.': 'dot.png',
+    '=': 'wall.png',
+    '*': 'power.png',
+    'g': 'ghost1.png',
+    'G': 'ghost2.png',
+}
 
 # An array containing the world tiles
 
