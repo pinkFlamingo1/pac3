@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "../"
+		}
+	],
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Python: pac.py",
+				"type": "python",
+				"request": "launch",
+				"program": "${workspaceFolder}/app/pac.py",
+				"env": {},
+				"console": "integratedTerminal"
+			},
+			
+		]
+	},
+	
+  
+}

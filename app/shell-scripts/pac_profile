@@ -1,0 +1,9 @@
+# .bash_profile
+#  User specific environment and startup programs
+
+export CS_GITROOT=$HOME/Documents/GitHub-intel/pac2
+echo -e "***"
+echo -e $CS_GITROOT
+echo -e "***"
+echo -e 'Welcome!\n'
+
