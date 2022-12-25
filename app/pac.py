@@ -12,61 +12,61 @@ import random
 
 WIDTH = 640
 HEIGHT = 640
-TITLE = 'Pac-Man'
+TITLE = "Pac-Man"
 WORLD_SIZE = 20
 BLOCK_SIZE = 32
 WIDTH = WORLD_SIZE * BLOCK_SIZE
 HEIGHT = WORLD_SIZE * BLOCK_SIZE
 SPEED = 2
 GHOST_SPEED = 1
-WELCOME_SCREEN = '''
+WELCOME_SCREEN = """
 Welcome to Pacman!
 Please enter your name:
-'''
+"""
 
-leaderboard = '''
+leaderboard = """
 Leaderboard:
 1. 1000
 2. 900
 3. 800
 4. 700
-'''
+"""
 
 char_to_image = {
-    '.': 'dot.png',
-    '=': 'wall.png',
-    '*': 'power.png',
-    'g': 'ghost1.png',
-    'G': 'ghost2.png',
+    ".": "dot.png",
+    "=": "wall.png",
+    "*": "power.png",
+    "g": "ghost1.png",
+    "G": "ghost2.png",
 }
 
 # An array containing the world tiles
 
 world = [
-    '====================',
-    '=........G.........=',
-    '==..=..=..=..=..=..=',
-    '=........=...=...=.=',
-    '=...g..=...=...=...=',
-    '=......=...=.*.=...=',
-    '=......=...=...=...=',
-    '==..=..=..=..=..=..=',
-    '=........=...=...=.=',
-    '=..g...=...=...=...=',
-    '=......=...=...=...=',
-    '=......=...=...=...=',
-    '==..=..=..=..=..=..=',
-    '=.....G..=...=...=.=',
-    '=..*...=...=...=...=',
-    '=......=...=...=...=',
-    '=......=...=...=...=',
-    '=......=...=...=...=',
-    '=......=...=...=...=',
-    '====================',
+    "====================",
+    "=........G.........=",
+    "==..=..=..=..=..=..=",
+    "=........=...=...=.=",
+    "=...g..=...=...=...=",
+    "=......=...=.*.=...=",
+    "=......=...=...=...=",
+    "==..=..=..=..=..=..=",
+    "=........=...=...=.=",
+    "=..g...=...=...=...=",
+    "=......=...=...=...=",
+    "=......=...=...=...=",
+    "==..=..=..=..=..=..=",
+    "=.....G..=...=...=.=",
+    "=..*...=...=...=...=",
+    "=......=...=...=...=",
+    "=......=...=...=...=",
+    "=......=...=...=...=",
+    "=......=...=...=...=",
+    "====================",
 ]
 
 # Our sprites
-pacman = Actor('pacman_o.png')
+pacman = Actor("pacman_o.png")
 pacman.x = pacman.y = 1.5 * BLOCK_SIZE
 # Direction that we're going in
 pacman.dx, pacman.dy = 0, 0
@@ -81,7 +81,7 @@ pacman.player = ""
 pacman.name_saved = False
 pacman.food_left = 0
 for row in world:
-    pacman.food_left += row.count('.')
+    pacman.food_left += row.count(".")
 
 ghosts = []
 # Where do the ghosts start?
@@ -93,11 +93,11 @@ BOX = Rect((50, 380), (200, 75))
 # Your level will contain characters, they map
 # to the following images
 char_to_image = {
-    '.': 'dot.png',
-    '=': 'wall.png',
-    '*': 'power.png',
-    'g': 'ghost1.png',
-    'G': 'ghost2.png',
+    ".": "dot.png",
+    "=": "wall.png",
+    "*": "power.png",
+    "g": "ghost1.png",
+    "G": "ghost2.png",
 }
 
 
@@ -122,18 +122,18 @@ def check_world():
 
 def eat_food():
     ix, iy = int(pacman.x / BLOCK_SIZE), int(pacman.y / BLOCK_SIZE)
-    if world[iy][ix] == '.':
-        world[iy] = world[iy][:ix] + " " + world[iy][ix + 1:]
+    if world[iy][ix] == ".":
+        world[iy] = world[iy][:ix] + " " + world[iy][ix + 1 :]
         pacman.food_left -= 1
         pacman.score += 1
         sounds.eat_food.play()
         print("Food left: ", pacman.food_left)
-    elif world[iy][ix] == '*':
+    elif world[iy][ix] == "*":
         powerup(ix, iy)
 
 
 def powerup(ix, iy):
-    world[iy] = world[iy][:ix] + " " + world[iy][ix + 1:]
+    world[iy] = world[iy][:ix] + " " + world[iy][ix + 1 :]
     pacman.score += 5
     pacman.powerup = 25
     sounds.power_pellet.play()
@@ -160,14 +160,14 @@ def new_ghost_direction(g, GHOST_SPEED):
 def make_ghost_actors():
     for y, row in enumerate(world):
         for x, block in enumerate(row):
-            if block in ['g', 'G']:
+            if block in ["g", "G"]:
                 # Make the sprite in the correct position
-                g = Actor(char_to_image[block], (x * BLOCK_SIZE, y * BLOCK_SIZE), anchor=('left', 'top'))
+                g = Actor(char_to_image[block], (x * BLOCK_SIZE, y * BLOCK_SIZE), anchor=("left", "top"))
                 new_ghost_direction(g, GHOST_SPEED)
                 ghosts.append(g)
                 ghost_start_pos.append((x, y))
                 # Now we have the ghost sprite we don't need this block
-                world[y] = world[y][:x] + "." + world[y][x + 1:]
+                world[y] = world[y][:x] + "." + world[y][x + 1 :]
 
 
 def defualt_text(text, topleft=(0, 0), fontsize=30, fontname="chalkduster", font_color="blue"):
@@ -175,13 +175,13 @@ def defualt_text(text, topleft=(0, 0), fontsize=30, fontname="chalkduster", font
 
 
 def draw():
-    screen.clear()                                                                         # type: ignore # noqa: F821
+    screen.clear()  # type: ignore # noqa: F821
 
     if pacman.name_saved and not pacman.initialised:
-        defualt_text("Press space to start", topleft=(60, 500))  # type: ignore # noqa: F821
+        defualt_text("Press space to start", topleft=(60, 500))
 
     if not pacman.initialised:
-        screen.draw.rect(BOX, RED)                                                         # type: ignore # noqa: F821
+        screen.draw.rect(BOX, RED)  # type: ignore # noqa: F821
         defualt_text(WELCOME_SCREEN, topleft=(50, 4))
         defualt_text(leaderboard, topleft=(50, 100))
         defualt_text(pacman.player, topleft=(60, 400))
@@ -190,15 +190,15 @@ def draw():
             for x, block in enumerate(row):
                 image = char_to_image.get(block, None)
                 if image:
-                    screen.blit(char_to_image[block], (x * BLOCK_SIZE, y * BLOCK_SIZE))    # type: ignore # noqa: F821
+                    screen.blit(char_to_image[block], (x * BLOCK_SIZE, y * BLOCK_SIZE))  # type: ignore # noqa: F821
         pacman.draw()
         for g in ghosts:
             g.draw()
 
         if pacman.banner and pacman.banner_counter > 0:
-            screen.draw.text(pacman.banner, center=(WIDTH / 2, HEIGHT / 2), fontsize=120)   # type: ignore # noqa: F821
+            screen.draw.text(pacman.banner, center=(WIDTH / 2, HEIGHT / 2), fontsize=80, fontname="chalkduster", owidth=1, ocolor="blue")  # type: ignore # noqa: F821
 
-        screen.draw.text("Score: %s" % pacman.score, topleft=(8, 4), fontsize=40)           # type: ignore # noqa: F821
+        screen.draw.text("Score: %s" % pacman.score, topleft=(8, 4), fontsize=40)  # type: ignore # noqa: F821
         screen.draw.text("Lives: %s" % pacman.lives, topright=(WIDTH - 8, 4), fontsize=40)  # type: ignore # noqa: F821
 
 
@@ -244,9 +244,9 @@ def move_ahead(sprite):
     oldx, oldy = sprite.x, sprite.y
 
     # In order to go in direction dx, dy there must be no wall that way
-    if '=' not in blocks_ahead_of(sprite, sprite.dx, 0):
+    if "=" not in blocks_ahead_of(sprite, sprite.dx, 0):
         sprite.x += sprite.dx
-    if '=' not in blocks_ahead_of(sprite, 0, sprite.dy):
+    if "=" not in blocks_ahead_of(sprite, 0, sprite.dy):
         sprite.y += sprite.dy
 
     # Keep sprite on the screen
@@ -254,7 +254,7 @@ def move_ahead(sprite):
     sprite.y = wrap_around(0, sprite.y, HEIGHT - BLOCK_SIZE)
 
     # Return whether we moved
-    moved = (oldx != sprite.x or oldy != sprite.y)
+    moved = oldx != sprite.x or oldy != sprite.y
 
     # Costume change for pacman
     if moved and sprite == pacman:
@@ -292,14 +292,14 @@ def update():
 
         for g in ghosts:
             if g.colliderect(pacman):
-                set_banner('Ouch!', 5)
+                set_banner("Ouch!", 5)
                 pacman.lives -= 1
                 reset_sprites()
             if not move_ahead(g):
                 new_ghost_direction(g, GHOST_SPEED)
 
         if pacman.lives == 0:
-            set_banner('Game Over', 5)
+            set_banner("Game Over", 5)
             clock.schedule_unique(new_game, 2)
             pacman.freeze = True
             pacman.lives = 3
@@ -333,13 +333,10 @@ def on_key_down(key):
                 pacman.player = pacman.player[:-1]
             elif key == keys.RETURN and len(pacman.player) > 0:
                 pacman.name_saved = True
-                print("Name Saved")
             elif 65 <= key.value <= 127:
                 pacman.player += chr(key.value)
-                print(pacman.player)
 
         if pacman.name_saved and key == keys.SPACE:
-            print(pacman.player)
             pacman.initialised = True
             sounds.pacman_beginning.play()
 
@@ -347,6 +344,7 @@ def on_key_down(key):
 def periodic():
     if pacman.banner_counter > 0:
         pacman.banner_counter -= 1
+
 
 # Game set up
 
