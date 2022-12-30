@@ -142,7 +142,6 @@ def eat_food():
         pacman.food_left -= 1
         pacman.score += 1
         sounds.eat_food.play()  # plays sound effect when pill is eaten
-        # print("Food left: ", pacman.food_left)
     elif pacman.world[iy][ix] == "*":
         powerup(ix, iy)
 
@@ -195,7 +194,7 @@ def defualt_text(text, topleft=(0, 0), fontsize=30, fontname="chalkduster", font
 
 
 def draw():
-    # If a nmae has been entered and the game has started 'Prs space to start' is printed
+    # If a name has been entered and the game has started 'Prs space to start' is printed
     # A red box is drawn to
     screen.clear()  # type: ignore # noqa: F821
 
@@ -393,7 +392,8 @@ def periodic():
 
 
 def record_high_score(hs_dict):
-
+    """records the high score and then updates the leaderboard based on score
+    """
     newHighScore = {}
     savedName = ""
     savedScore = ""
@@ -435,7 +435,6 @@ def record_high_score_table(hs_dict):
 
 
 def get_high_score_table():
-
     high_score_table = pacman.high_score_table
 
     try:
