@@ -28,15 +28,6 @@ Welcome to Pacman!
 Please enter your name:
 """
 
-leaderboard = """
-Leaderboard:
-1. 1000
-2. 900
-3.
-4.
-5.
-"""
-
 # An array containing the world tiles
 
 world = [
@@ -469,7 +460,6 @@ def set_leaderboard():
 
 
 # Game set up
-
 
 check_world()
 
