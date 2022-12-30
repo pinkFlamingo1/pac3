@@ -151,7 +151,7 @@ def eat_food():
         pacman.food_left -= 1
         pacman.score += 1
         sounds.eat_food.play()  # plays sound effect when pill is eaten
-        print("Food left: ", pacman.food_left)
+        # print("Food left: ", pacman.food_left)
     elif pacman.world[iy][ix] == "*":
         powerup(ix, iy)
 
@@ -460,7 +460,6 @@ def set_leaderboard():
     leaderboard = "\nLeaderboard:"
 
     for k, v in pacman.high_score_table.items():
-        print(v)
         name = v.get("name").strip().title()
         score = v.get("score")
         text = f"\n{k} {name:10} {score}"
