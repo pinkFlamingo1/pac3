@@ -7,9 +7,13 @@ from pgzero.clock import clock
 from pgzero.keyboard import keys
 from pgzero.loaders import sounds
 from pgzero.rect import Rect
+import copy
 
 import random
+import json
 
+
+DataPath = "Assets/Data/"
 WIDTH = 640
 HEIGHT = 640
 TITLE = "Pac-Man"
@@ -28,17 +32,10 @@ leaderboard = """
 Leaderboard:
 1. 1000
 2. 900
-3. 800
-4. 700
+3.
+4.
+5.
 """
-
-char_to_image = {
-    ".": "dot.png",
-    "=": "wall.png",
-    "*": "power.png",
-    "g": "ghost1.png",
-    "G": "ghost2.png",
-}
 
 # An array containing the world tiles
 
@@ -65,6 +62,8 @@ world = [
     "====================",
 ]
 
+starting_world = copy.deepcopy(world)
+
 # Our sprites
 pacman = Actor("pacman_o.png")
 pacman.x = pacman.y = 1.5 * BLOCK_SIZE
@@ -80,6 +79,14 @@ pacman.initialised = False
 pacman.player = ""
 pacman.name_saved = False
 pacman.food_left = 0
+pacman.high_score_table = {
+    "1": {"name": "-", "score": 0},
+    "2": {"name": "-", "score": 0},
+    "3": {"name": "-", "score": 0},
+    "4": {"name": "-", "score": 0},
+    "5": {"name": "-", "score": 0},
+}
+pacman.leaderboard = ""
 for row in world:
     pacman.food_left += row.count(".")
 
@@ -102,6 +109,13 @@ char_to_image = {
 
 
 def check_world():
+    """This checks that the world is the correct depth, width and each character is valid
+
+    Args:
+        depth: depth of map
+        width: width of map
+        res: error message flagged
+    """
     res = True
     depth = len(world)
     width = len(world[0])
@@ -121,18 +135,26 @@ def check_world():
 
 
 def eat_food():
+    """increases the score by 1 each time a pill is eaten
+
+    Args:
+        pacman.food_left: amount of food left in map
+        pacman.score: game score
+    """
     ix, iy = int(pacman.x / BLOCK_SIZE), int(pacman.y / BLOCK_SIZE)
     if world[iy][ix] == ".":
         world[iy] = world[iy][:ix] + " " + world[iy][ix + 1 :]
         pacman.food_left -= 1
         pacman.score += 1
-        sounds.eat_food.play()
+        sounds.eat_food.play()  # plays sound effect when pill is eaten
         print("Food left: ", pacman.food_left)
     elif world[iy][ix] == "*":
         powerup(ix, iy)
 
 
 def powerup(ix, iy):
+    # increases the score by 5 each time a powerup is eaten
+    # displays 'power up!' when power up eaten
     world[iy] = world[iy][:ix] + " " + world[iy][ix + 1 :]
     pacman.score += 5
     pacman.powerup = 25
@@ -144,11 +166,13 @@ def powerup(ix, iy):
 
 
 def powerdown():
+    # displays power down when power up is fading
     set_banner("Power down", 3)
     pacman.powerup = 0
 
 
 def new_ghost_direction(g, GHOST_SPEED):
+    # slows down ghosts when power up is eaten
     if pacman.powerup:
         g.dx = math.copysign(GHOST_SPEED * 1.5, g.x - pacman.x)
         g.dy = math.copysign(GHOST_SPEED * 1.5, g.y - pacman.y)
@@ -171,10 +195,13 @@ def make_ghost_actors():
 
 
 def defualt_text(text, topleft=(0, 0), fontsize=30, fontname="chalkduster", font_color="blue"):
+    # sets default text
     screen.draw.text(text, topleft=topleft, fontname=fontname, fontsize=fontsize, owidth=1, ocolor=font_color)  # type: ignore # noqa: F821
 
 
 def draw():
+    # If a nmae has been entered and the game has started 'Prs space to start' is printed
+    # A red box is drawn to
     screen.clear()  # type: ignore # noqa: F821
 
     if pacman.name_saved and not pacman.initialised:
@@ -183,9 +210,10 @@ def draw():
     if not pacman.initialised:
         screen.draw.rect(BOX, RED)  # type: ignore # noqa: F821
         defualt_text(WELCOME_SCREEN, topleft=(50, 4))
-        defualt_text(leaderboard, topleft=(50, 100))
+        defualt_text(pacman.leaderboard, topleft=(50, 100))
         defualt_text(pacman.player, topleft=(60, 400))
     else:
+        print(world)
         for y, row in enumerate(world):
             for x, block in enumerate(row):
                 image = char_to_image.get(block, None)
@@ -286,6 +314,13 @@ def set_banner(message, count):
 
 
 def update():
+    """updates the game and prints ouch if pacman collides with ghost
+
+    Args:
+       pacman.freeze: stops pacmans movement
+       pacman.lives: amount of lives pacman has
+       pacman.score: pacman's score
+    """
     if pacman.freeze is False:
         move_ahead(pacman)
         eat_food()
@@ -300,8 +335,18 @@ def update():
 
         if pacman.lives == 0:
             set_banner("Game Over", 5)
+            record_high_score(pacman.high_score_table)
             clock.schedule_unique(new_game, 2)
+            world = copy.deepcopy(starting_world)
+            pacman.food_left = 0
+            for row in world:
+                pacman.food_left += row.count(".")
+            print(world)
+            set_leaderboard()
             pacman.freeze = True
+            pacman.initialised = False
+            pacman.name_saved = False
+
             pacman.lives = 3
             pacman.score = 0
 
@@ -319,6 +364,13 @@ def on_key_up(key):
 
 
 def on_key_down(key):
+    """moves pacman based on key pressed
+
+    Args:
+        key (char): key input by user
+        pacman.name_saved: name input by user
+        pacman.initialised: whether game has started or not
+    """
     if key == keys.LEFT:
         pacman.dx = -SPEED
     if key == keys.RIGHT:
@@ -333,12 +385,12 @@ def on_key_down(key):
                 pacman.player = pacman.player[:-1]
             elif key == keys.RETURN and len(pacman.player) > 0:
                 pacman.name_saved = True
-            elif 65 <= key.value <= 127:
+            elif 65 <= key.value <= 127:  # stores key as ASCII value
                 pacman.player += chr(key.value)
 
         if pacman.name_saved and key == keys.SPACE:
             pacman.initialised = True
-            sounds.pacman_beginning.play()
+            sounds.pacman_beginning.play()  # plays music if name entered and space pressed
 
 
 def periodic():
@@ -346,10 +398,81 @@ def periodic():
         pacman.banner_counter -= 1
 
 
+def record_high_score(hs_dict):
+
+    newHighScore = {}
+    savedName = ""
+    savedScore = ""
+    highScoreFlag = False
+
+    for i in range(5):
+        key = i + 1
+        if key <= len(hs_dict):
+            key = str(key)
+            # Get the keys of the high score table
+            name = hs_dict.get(key)["name"]
+            score = hs_dict.get(key)["score"]
+
+            if pacman.score > score and not highScoreFlag:
+                # If the score in the table is greater than the high score add
+                # the name and score to the new table for this key
+                newHighScore[key] = {"name": pacman.player, "score": pacman.score}
+                highScoreFlag = True
+                savedName = name
+                savedScore = score
+            else:
+                if not highScoreFlag:
+                    # If the high score is greater than a row in the table save the high score details
+                    # only do this one
+                    newHighScore[key] = {"name": name, "score": score}
+                else:
+                    newHighScore[key] = {"name": savedName, "score": savedScore}
+                    savedName = name
+                    savedScore = score
+
+    pacman.high_score_table = newHighScore
+    record_high_score_table(pacman.high_score_table)
+
+
+def record_high_score_table(hs_dict):
+    with open(DataPath + "HighScoreTable.txt", "w") as f:
+        score = json.dumps(hs_dict)
+        f.write(score)
+
+
+def get_high_score_table():
+
+    high_score_table = pacman.high_score_table
+
+    try:
+        with open(DataPath + "HighScoreTable.txt", "r") as f:
+            high_score_table = json.load(f)
+    except Exception as e:
+        print("Exception " + str(e))
+
+    return high_score_table
+
+
+def set_leaderboard():
+    pacman.high_score_table = get_high_score_table()
+    leaderboard = "\nLeaderboard:"
+
+    for k, v in pacman.high_score_table.items():
+        print(v)
+        name = v.get("name").strip().title()
+        score = v.get("score")
+        text = f"\n{k} {name:10} {score}"
+        leaderboard += text
+
+    pacman.leaderboard = leaderboard
+
+
 # Game set up
 
 
 check_world()
+
+set_leaderboard()
 
 clock.schedule_interval(periodic, 0.2)
 
