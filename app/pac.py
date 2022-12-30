@@ -319,34 +319,35 @@ def update():
         move_ahead(pacman)
         eat_food()
 
-        for g in ghosts:
-            if g.colliderect(pacman):
-                set_banner("Ouch!", 5)
-                pacman.lives -= 1
-                reset_sprites()
-            if not move_ahead(g):
-                new_ghost_direction(g, GHOST_SPEED)
+        if pacman.initialised:
+            for g in ghosts:
+                if g.colliderect(pacman):
+                    set_banner("Ouch!", 5)
+                    sounds.pacman_death.play()
+                    pacman.lives -= 1
+                    reset_sprites()
+                if not move_ahead(g):
+                    new_ghost_direction(g, GHOST_SPEED)
 
-        if pacman.lives == 0:
-            set_banner("Game Over", 5)
-            record_high_score(pacman.high_score_table)
-            clock.schedule_unique(new_game, 2)
-            pacman.world = copy.deepcopy(reset_world)
-            pacman.food_left = 0
-            for row in pacman.world:
-                pacman.food_left += row.count(".")
-            set_leaderboard()
-            pacman.freeze = True
-            pacman.initialised = False
-            pacman.name_saved = False
-
-            pacman.lives = 3
-            pacman.score = 0
+            if pacman.lives == 0:
+                set_banner("Game Over", 5)
+                pacman.freeze = True
+                clock.schedule_unique(new_game, 4)
 
 
 def new_game():
     pacman.freeze = False
     reset_sprites()
+    record_high_score(pacman.high_score_table)
+    pacman.world = copy.deepcopy(reset_world)
+    pacman.food_left = 0
+    for row in pacman.world:
+        pacman.food_left += row.count(".")
+    set_leaderboard()
+    pacman.initialised = False
+    pacman.name_saved = False
+    pacman.lives = 3
+    pacman.score = 0
 
 
 def on_key_up(key):
