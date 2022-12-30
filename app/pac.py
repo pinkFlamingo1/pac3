@@ -62,8 +62,6 @@ world = [
     "====================",
 ]
 
-starting_world = copy.deepcopy(world)
-
 # Our sprites
 pacman = Actor("pacman_o.png")
 pacman.x = pacman.y = 1.5 * BLOCK_SIZE
@@ -87,7 +85,13 @@ pacman.high_score_table = {
     "5": {"name": "-", "score": 0},
 }
 pacman.leaderboard = ""
+reset_world = []
 for row in world:
+    row = row.replace("G", ".").replace("g", ".")
+    reset_world.append(row)
+
+pacman.world = copy.deepcopy(world)
+for row in reset_world:
     pacman.food_left += row.count(".")
 
 ghosts = []
@@ -117,12 +121,12 @@ def check_world():
         res: error message flagged
     """
     res = True
-    depth = len(world)
-    width = len(world[0])
+    depth = len(pacman.world)
+    width = len(pacman.world[0])
     if depth != WORLD_SIZE:
         raise Exception("World is not the right depth")
         res = False
-    for row in world:
+    for row in pacman.world:
         if len(row) != width:
             raise Exception("World rows are not all the same width")
             res = False
@@ -142,20 +146,20 @@ def eat_food():
         pacman.score: game score
     """
     ix, iy = int(pacman.x / BLOCK_SIZE), int(pacman.y / BLOCK_SIZE)
-    if world[iy][ix] == ".":
-        world[iy] = world[iy][:ix] + " " + world[iy][ix + 1 :]
+    if pacman.world[iy][ix] == ".":
+        pacman.world[iy] = pacman.world[iy][:ix] + " " + pacman.world[iy][ix + 1 :]
         pacman.food_left -= 1
         pacman.score += 1
         sounds.eat_food.play()  # plays sound effect when pill is eaten
         print("Food left: ", pacman.food_left)
-    elif world[iy][ix] == "*":
+    elif pacman.world[iy][ix] == "*":
         powerup(ix, iy)
 
 
 def powerup(ix, iy):
     # increases the score by 5 each time a powerup is eaten
     # displays 'power up!' when power up eaten
-    world[iy] = world[iy][:ix] + " " + world[iy][ix + 1 :]
+    pacman.world[iy] = pacman.world[iy][:ix] + " " + pacman.world[iy][ix + 1 :]
     pacman.score += 5
     pacman.powerup = 25
     sounds.power_pellet.play()
@@ -182,7 +186,7 @@ def new_ghost_direction(g, GHOST_SPEED):
 
 
 def make_ghost_actors():
-    for y, row in enumerate(world):
+    for y, row in enumerate(pacman.world):
         for x, block in enumerate(row):
             if block in ["g", "G"]:
                 # Make the sprite in the correct position
@@ -191,7 +195,7 @@ def make_ghost_actors():
                 ghosts.append(g)
                 ghost_start_pos.append((x, y))
                 # Now we have the ghost sprite we don't need this block
-                world[y] = world[y][:x] + "." + world[y][x + 1 :]
+                pacman.world[y] = pacman.world[y][:x] + "." + pacman.world[y][x + 1 :]
 
 
 def defualt_text(text, topleft=(0, 0), fontsize=30, fontname="chalkduster", font_color="blue"):
@@ -213,8 +217,7 @@ def draw():
         defualt_text(pacman.leaderboard, topleft=(50, 100))
         defualt_text(pacman.player, topleft=(60, 400))
     else:
-        print(world)
-        for y, row in enumerate(world):
+        for y, row in enumerate(pacman.world):
             for x, block in enumerate(row):
                 image = char_to_image.get(block, None)
                 if image:
@@ -247,13 +250,13 @@ def blocks_ahead_of(sprite, dx, dy):
     if iy == WORLD_SIZE - 1:
         ry = 0
 
-    blocks = [world[iy][ix]]
+    blocks = [pacman.world[iy][ix]]
     if rx:
-        blocks.append(world[iy][ix + 1])
+        blocks.append(pacman.world[iy][ix + 1])
     if ry:
-        blocks.append(world[iy + 1][ix])
+        blocks.append(pacman.world[iy + 1][ix])
     if rx and ry:
-        blocks.append(world[iy + 1][ix + 1])
+        blocks.append(pacman.world[iy + 1][ix + 1])
 
     return blocks
 
@@ -337,11 +340,10 @@ def update():
             set_banner("Game Over", 5)
             record_high_score(pacman.high_score_table)
             clock.schedule_unique(new_game, 2)
-            world = copy.deepcopy(starting_world)
+            pacman.world = copy.deepcopy(reset_world)
             pacman.food_left = 0
-            for row in world:
+            for row in pacman.world:
                 pacman.food_left += row.count(".")
-            print(world)
             set_leaderboard()
             pacman.freeze = True
             pacman.initialised = False
